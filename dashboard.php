@@ -11,11 +11,11 @@ if (!isset($_SESSION['username'])) {
 $username = $_SESSION['username'];
 $role = $_SESSION['role'];
 ?>
-
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-   <title>Dashboard Penjualan</title>
+    <meta charset="UTF-8">
+    <title>Dashboard Penjualan</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -26,10 +26,13 @@ $role = $_SESSION['role'];
             color: #008080;
             text-align: center;
         }
+        h2, h3 {
+            text-align: center;
+        }
         table {
             margin: 20px auto;
             border-collapse: collapse;
-            width: 70%;
+            width: 75%;
         }
         table, th, td {
             border: 1px solid #555;
@@ -53,85 +56,91 @@ $role = $_SESSION['role'];
             color: white;
             padding: 8px 16px;
             border-radius: 5px;
+            width: 120px;
+            margin-left: auto;
+            margin-right: auto;
         }
         .logout:hover {
             background-color: #006666;
         }
         hr {
             width: 80%;
-            margin: auto;
+            margin: 20px auto;
         }
     </style>
 </head>
 <body>
-    <h1>-- POLGAN MART --</h1>
-    <h3 style="text-align:center;">Selamat Datang, 
-        <?php echo $_SESSION['username']; ?> 
-        (<?php echo $_SESSION['role']; ?>)
-    </h3>
 
-    <hr>
+<h1>-- POLGAN MART --</h1>
+<h3>Selamat Datang, <?php echo $username; ?> (<?php echo $role; ?>)</h3>
 
-    <?php
-    // Membuat daftar produk dengan array
+<hr>
 
-    $kode_barang = ["BARANG001", "BARANG002", "BARANG003", "BARANG004", "BARANG005"];
-    $nama_barang = ["Indomie", "Teh Sosro", "Roti", "Susu Milo", "Waffle"];
-    $harga_barang = [5000, 4000, 7000, 5000, 5000];
+<?php
+// ================== DAFTAR PRODUK ==================
+$kode_barang  = ["BARANG001", "BARANG002", "BARANG003", "BARANG004", "BARANG005"];
+$nama_barang  = ["Indomie", "Teh Sosro", "Roti", "Susu Milo", "Waffle"];
+$harga_barang = [5000, 4000, 7000, 5000, 5000];
+?>
 
-    echo "<h2 style='text-align:center;'>Daftar Produk</h2>";
-    echo "<table>";
-    echo "<tr><th>Kode Barang</th><th>Nama Barang</th><th>Harga (Rp)</th></tr>";
+<h2>Daftar Produk</h2>
+<table>
+    <tr>
+        <th>Kode Barang</th>
+        <th>Nama Barang</th>
+        <th>Harga (Rp)</th>
+    </tr>
+    <?php for ($i = 0; $i < count($kode_barang); $i++) : ?>
+        <tr>
+            <td><?php echo $kode_barang[$i]; ?></td>
+            <td><?php echo $nama_barang[$i]; ?></td>
+            <td><?php echo number_format($harga_barang[$i], 0, ',', '.'); ?></td>
+        </tr>
+    <?php endfor; ?>
+</table>
 
-    for ($i = 0; $i < count($kode_barang); $i++) {
-        echo "<tr>";
-        echo "<td>" . $kode_barang[$i] . "</td>";
-        echo "<td>" . $nama_barang[$i] . "</td>";
-        echo "<td>" . number_format($harga_barang[$i], 0, ',', '.') . "</td>";
-        echo "</tr>";
-    }
+<?php
+// ================== DETAIL PEMBELIAN ==================
+$pembelian = [
+    ["kode" => "BARANG001", "nama" => "Indomie", "harga" => 5000, "jumlah" => 3],
+    ["kode" => "BARANG003", "nama" => "Roti", "harga" => 7000, "jumlah" => 5],
+    ["kode" => "BARANG005", "nama" => "Waffle", "harga" => 5000, "jumlah" => 2],
+];
 
-    echo "</table>";
+$grandtotal = 0;
+?>
 
+<h2>Detail Pembelian (Simulasi)</h2>
+<table>
+    <tr>
+        <th>Kode Barang</th>
+        <th>Nama Barang</th>
+        <th>Harga (Rp)</th>
+        <th>Jumlah</th>
+        <th>Total (Rp)</th>
+    </tr>
 
-    // ===== Commit 6 – Logika Penjualan Random =====
-    echo "<h2 style='text-align:center;'>Simulasi Transaksi Penjualan (Random)</h2>";
+    <?php foreach ($pembelian as $item) : ?>
+        <?php
+            $total = $item['harga'] * $item['jumlah'];
+            $grandtotal += $total;
+        ?>
+        <tr>
+            <td><?php echo $item['kode']; ?></td>
+            <td><?php echo $item['nama']; ?></td>
+            <td><?php echo number_format($item['harga'], 0, ',', '.'); ?></td>
+            <td><?php echo $item['jumlah']; ?></td>
+            <td><?php echo number_format($total, 0, ',', '.'); ?></td>
+        </tr>
+    <?php endforeach; ?>
 
-    $beli = [];       // array untuk menyimpan kode barang yang dibeli
-    $jumlah = [];     // array untuk jumlah pembelian setiap barang
-    $total = [];      // total harga tiap barang
-    $grandtotal = 0;  // total semua pembelian
+    <tr style="font-weight:bold; background-color:#e0f7f7;">
+        <td colspan="4">Grand Total</td>
+        <td>Rp <?php echo number_format($grandtotal, 0, ',', '.'); ?></td>
+    </tr>
+</table>
 
-    echo "<table>";
-    echo "<tr><th>Kode Barang</th><th>Nama Barang</th><th>Harga (Rp)</th><th>Jumlah Beli</th><th>Total (Rp)</th></tr>";
+<a class="logout" href="logout.php">Logout</a>
 
-    // Menampilkan 5 pembelian acak
-    for ($i = 0; $i < 5; $i++) {
-        $acak = rand(0, count($kode_barang) - 1); // memilih barang acak
-        $jumlah_beli = rand(1, 5); // jumlah acak antara 1–5
-
-        $beli[] = $kode_barang[$acak];
-        $jumlah[] = $jumlah_beli;
-        $total_harga = $harga_barang[$acak] * $jumlah_beli;
-        $total[] = $total_harga;
-        $grandtotal += $total_harga;
-
-        echo "<tr>";
-        echo "<td>" . $kode_barang[$acak] . "</td>";
-        echo "<td>" . $nama_barang[$acak] . "</td>";
-        echo "<td>" . number_format($harga_barang[$acak], 0, ',', '.') . "</td>";
-        echo "<td>" . $jumlah_beli . "</td>";
-        echo "<td>" . number_format($total_harga, 0, ',', '.') . "</td>";
-        echo "</tr>";
-    }
-
-    echo "<tr style='font-weight:bold; background-color:#e0f7f7;'>";
-    echo "<td colspan='4'>Grand Total</td>";
-    echo "<td>Rp " . number_format($grandtotal, 0, ',', '.') . "</td>";
-    echo "</tr>";
-    echo "</table>";
-    ?>
-
-    <a class="logout" href="logout.php">Logout</a>
 </body>
 </html>
